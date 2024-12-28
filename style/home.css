@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'Robotica';
+    src: url('../fonte/Robotica.ttf') format('truetype');
+}
+
+div{
+    border: 1px solid red;
+}
+
+#logoHome{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border: 1px solid green;
+    font-size: 35px;
+    font-weight: bold;
+    font-family: 'Robotica', sans-serif;
+    letter-spacing: 3px;
+    color: #;
+}
