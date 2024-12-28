@@ -3,8 +3,27 @@
     src: url('../fonte/Robotica.ttf') format('truetype');
 }
 
+@keyframes piscar {
+    0%, 100% {
+        color: #e9e3e6; /* Laranja */
+    }
+    50% {
+        color: #87cefa; /* Azul */
+    }
+}
+
+#body{
+    height: 100vh;
+    background: linear-gradient(to bottom, #1b4188, #0d2144, #143166);
+    color: #e9e3e6;
+}
+
 div{
     border: 1px solid red;
+}
+
+a{
+    color: #e9e3e6;
 }
 
 #logoHome{
@@ -17,4 +36,7 @@ div{
     font-family: 'Robotica', sans-serif;
     letter-spacing: 3px;
     color: #101010;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+    animation: piscar 3s infinite;
 }
+
