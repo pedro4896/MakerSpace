@@ -36,6 +36,43 @@ app.post('/login', (req, res) => {
   });
 });
 
+// Rota para inserir dados no banco
+app.post('/inserir-usuario', (req, res) => {
+  const { nome, email, login, senha } = req.body;
+
+  const query = 'INSERT INTO usuarios (nome, email, login, senha) VALUES (?, ?, ?, ?)';
+
+  db.query(query, [nome, email, login, senha], (err, result) => {
+    if (err) {
+      console.error('Erro ao inserir usuário:', err);
+      res.status(500).send('Erro ao inserir usuário no banco de dados.');
+    } else {
+      console.log('Usuário inserido com sucesso:', result);
+      res.status(201).send('Usuário inserido com sucesso!');
+    }
+  });
+});
+
+// Rota para deletar dados do banco
+app.delete('/deletar-usuario/:nome', (req, res) => {
+  const { nome } = req.params; // Captura o nome enviado na URL
+
+  const query = 'DELETE FROM usuarios WHERE nome = ?';
+
+  db.query(query, [nome], (err, result) => {
+    if (err) {
+      console.error('Erro ao deletar usuário:', err);
+      res.status(500).send('Erro ao deletar usuário no banco de dados.');
+    } else if (result.affectedRows === 0) {
+      res.status(404).send('Usuário não encontrado.');
+    } else {
+      console.log(`Usuário com nome "${nome}" deletado com sucesso.`);
+      res.status(200).send(`Usuário com nome "${nome}" deletado com sucesso.`);
+    }
+  });
+});
+
+
 // Rota para exibir todos os usuários do banco
 app.get('/exibir-usuarios', (req, res) => {
   const query = 'SELECT * FROM usuarios';  // Consulta SQL para pegar todos os usuários
