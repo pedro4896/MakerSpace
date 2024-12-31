@@ -68,4 +68,18 @@ button{
 button:hover{
     background-color: #87cefa;
     font-weight: bold;
+    border: 3px solid black;
+}
+
+#button-login{
+    background-color: transparent;
+    border: 3px solid whitesmoke;
+    color: white;
+}
+
+#button-login:hover{
+    background-color: #87cefa;
+    font-weight: bold;
+    color: black;
+    border: 3px solid black;
 }

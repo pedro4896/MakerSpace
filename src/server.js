@@ -1,38 +1,87 @@
 const express = require('../node_modules/express');
 const bodyParser = require('../node_modules/body-parser');
 const cors = require('../node_modules/cors');  // Importa o pacote CORS
+const session = require('../node_modules/express-session'); // Importa o pacote de sessões
 const db = require('./db');
 const app = express();
 const port = 3000;
 
 // Configura o CORS para aceitar requisições de qualquer origem
 app.use(cors({
-  // origin: 'http://127.0.0.1:5500'  // Permite apenas esse domínio
-  origin: '*'
+  origin: 'http://127.0.0.1:5500', // Permite apenas esse domínio
+  credentials: true, // Permite o envio de cookies
 }));
 
-// Middleware para processar dados JSON
-app.use(bodyParser.json());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5500'); // Permitir o envio do cookie
+  res.header('Access-Control-Allow-Credentials', 'true'); // Permite o envio de cookies
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE'); // Métodos permitidos
+  res.header('Access-Control-Allow-Headers', 'Content-Type'); // Cabeçalhos permitidos
+  next();
+});
 
-// Rota de validação de login
+
+
+// Configura middleware para JSON e sessões
+app.use(bodyParser.json());
+app.use(session({
+  secret: 'MakerSpace', // Substitua por uma chave segura
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,  // Somente se estiver em produção com HTTPS, // True apenas se estiver usando HTTPS
+    httpOnly: true,
+    maxAge: 3600000, // Tempo de expiração (1 hora)
+    sameSite: 'None' // Isso permite o envio de cookies entre diferentes origens
+  }
+}));
+
+// Middleware para verificar autenticação
+function verificarAutenticacao(req, res, next) {
+  console.log('Sessão no backend:', req.session); // Verifique se a sessão está presente
+  if (req.session.user) {  // Confirma se a sessão do usuário existe
+    next(); // Usuário autenticado, segue para a rota
+  } else {
+    res.status(401).send('Acesso não autorizado. Faça login primeiro.');
+  }
+}
+
+app.get('/pagina-protegida', verificarAutenticacao, (req, res) => {
+  res.send(`Bem-vindo, ${req.session.user.nome}. Esta página é protegida.`);
+});
+
 app.post('/login', (req, res) => {
   const { login, senha } = req.body;
 
-  // Consulta SQL para verificar o login e a senha no banco de dados
   const query = 'SELECT * FROM usuarios WHERE login = ? AND senha = ?';
   db.query(query, [login, senha], (err, results) => {
     if (err) {
-      console.error('Erro ao executar consulta:', err);
-      res.status(500).send('Erro interno no servidor');
-      return;
+      console.error('Erro ao consultar o banco:', err);
+      return res.status(500).send('Erro interno no servidor');
     }
 
-    // Se o usuário for encontrado
     if (results.length > 0) {
-      res.status(200).send('Login bem-sucedido! Bem-vindo, ' + results[0].nome);
+      req.session.user = { 
+        id: results[0].id, 
+        nome: results[0].nome 
+      };
+      console.log('Sessão do usuário criada:', req.session); // Verifique se a sessão foi criada
+      res.status(200).send('Login bem-sucedido!');
     } else {
       res.status(401).send('Credenciais inválidas!');
     }
+  });
+});
+
+
+// Rota para logout
+app.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      res.status(500).send('Erro ao encerrar a sessão.');
+      return;
+    }
+    res.send('Logout realizado com sucesso.');
   });
 });
 
