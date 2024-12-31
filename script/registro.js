@@ -22,7 +22,7 @@ document.getElementById('login-Form').addEventListener('submit', async (e) => {
 
         // Redireciona o usuário após o login (substitua pela URL desejada)
         setTimeout(() => {
-          window.location.href = '../index.html';
+          window.location.href = '../pages/login.html';
         }, 2000);
       } else {
         console.log("Registro inválido!")

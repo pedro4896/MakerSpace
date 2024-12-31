@@ -20,7 +20,7 @@
 
         // Redireciona o usuário após o login (substitua pela URL desejada)
         setTimeout(() => {
-          window.location.href = '../index.html';
+          window.location.href = '../pages/home-login.html';
         }, 2000);
       } else {
         console.log("Credenciais inválidas!")
