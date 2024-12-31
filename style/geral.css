@@ -3,6 +3,13 @@
     src: url('../fonte/Robotica.ttf') format('truetype');
 }
 
+
+@font-face {
+    font-family: 'Tech';
+    src: url('../fonte/Techfont.ttf') format('truetype');
+}
+
+
 @keyframes piscar {
     0%, 100% {
         color: #e9e3e6; /* Laranja */
@@ -14,8 +21,10 @@
 
 #body{
     height: 100vh;
-    background: linear-gradient(to bottom, #1b4188, #0d2144, #143166);
+    background: linear-gradient(to bottom, #143166, #0d2144, #143166);
     color: #e9e3e6;
+    font-family: Tech, sans-serif;
+    letter-spacing: 2px;
 }
 
 .links{
@@ -60,4 +69,3 @@ button:hover{
     background-color: #87cefa;
     font-weight: bold;
 }
-
