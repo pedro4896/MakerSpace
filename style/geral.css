@@ -50,7 +50,7 @@
     letter-spacing: 3px;
     color: #101010;
     text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
-    animation: piscar 3s infinite;
+    animation: piscar 2s infinite;
 }
 
 .navTop{
