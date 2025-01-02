@@ -5,9 +5,10 @@ document.getElementById('login-Form').addEventListener('submit', async (e) => {
     // Obtém os valores dos campos de entrada
     const login = document.getElementById('exampleLogin').value;
     const senha = document.getElementById('exampleInputPassword1').value;
+    const Confirm_senha = document.getElementById('exampleInputPassword2').value;
     const nome = document.getElementById('exampleNome').value;
     const email = document.getElementById('exampleInputEmail1').value;
-
+    
     try {
       // Envia uma requisição POST para o servidor
       const response = await fetch('http://localhost:3000/inserir-usuario', {

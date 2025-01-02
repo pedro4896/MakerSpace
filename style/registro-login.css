@@ -37,3 +37,33 @@
     background-color: #87cefa;
     font-weight: bold;
 }
+
+#password1,#password2{
+    position: relative;
+}
+
+.toggle{
+	position: absolute;
+	top: 73%;
+	right: 16px;
+	translate:  0 -50%;
+	width: 30px;
+	height: 30px;
+	background-image: url("../image/hide.svg");
+	background-color: transparent;
+	background-size: 85%;
+	background-position: center;
+	background-repeat: no-repeat;
+    border: 0;
+}
+
+.toggle:hover{
+    border: 0;
+    background-color: transparent;
+}
+
+.toggle.showing{
+	background-image: url("../image/show.svg");
+}
+
+
