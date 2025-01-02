@@ -1,7 +1,6 @@
 const express = require('../node_modules/express');
-const bodyParser = require('../node_modules/body-parser');
 const cors = require('../node_modules/cors');  // Importa o pacote CORS
-const session = require('../node_modules/express-session'); // Importa o pacote de sessões
+const crypto = require('crypto'); // Para gerar o token de sessão
 const db = require('./db');
 const app = express();
 const port = 3000;
@@ -12,47 +11,19 @@ app.use(cors({
   credentials: true, // Permite o envio de cookies
 }));
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5500'); // Permitir o envio do cookie
-  res.header('Access-Control-Allow-Credentials', 'true'); // Permite o envio de cookies
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE'); // Métodos permitidos
-  res.header('Access-Control-Allow-Headers', 'Content-Type'); // Cabeçalhos permitidos
-  next();
-});
+// Middleware para analisar JSON no corpo das requisições
+app.use(express.json());
 
-
-
-// Configura middleware para JSON e sessões
-app.use(bodyParser.json());
-app.use(session({
-  secret: 'MakerSpace', // Substitua por uma chave segura
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false,  // Somente se estiver em produção com HTTPS, // True apenas se estiver usando HTTPS
-    httpOnly: true,
-    maxAge: 3600000, // Tempo de expiração (1 hora)
-    sameSite: 'None' // Isso permite o envio de cookies entre diferentes origens
-  }
-}));
-
-// Middleware para verificar autenticação
-function verificarAutenticacao(req, res, next) {
-  console.log('Sessão no backend:', req.session); // Verifique se a sessão está presente
-  if (req.session.user) {  // Confirma se a sessão do usuário existe
-    next(); // Usuário autenticado, segue para a rota
-  } else {
-    res.status(401).send('Acesso não autorizado. Faça login primeiro.');
-  }
+// Função para gerar um token de sessão único
+function gerarToken() {
+  return crypto.randomBytes(16).toString('hex'); // Gera um token de 32 caracteres
 }
 
-app.get('/pagina-protegida', verificarAutenticacao, (req, res) => {
-  res.send(`Bem-vindo, ${req.session.user.nome}. Esta página é protegida.`);
-});
-
+// Rota de login
 app.post('/login', (req, res) => {
   const { login, senha } = req.body;
 
+  // Consulta o banco de dados para verificar as credenciais do usuário
   const query = 'SELECT * FROM usuarios WHERE login = ? AND senha = ?';
   db.query(query, [login, senha], (err, results) => {
     if (err) {
@@ -61,12 +32,22 @@ app.post('/login', (req, res) => {
     }
 
     if (results.length > 0) {
-      req.session.user = { 
-        id: results[0].id, 
-        nome: results[0].nome 
-      };
-      console.log('Sessão do usuário criada:', req.session); // Verifique se a sessão foi criada
-      res.status(200).send('Login bem-sucedido!');
+      // Usuário encontrado, gerando um token de sessão
+      const token = gerarToken();
+      
+      // Armazena o token de sessão no banco de dados
+      const userId = results[0].id;
+      const updateQuery = 'UPDATE usuarios SET session_token = ? WHERE id = ?';
+      
+      db.query(updateQuery, [token, userId], (err) => {
+        if (err) {
+          console.error('Erro ao salvar o token no banco:', err);
+          return res.status(500).send('Erro interno ao gerar o token');
+        }
+        
+        // Retorna o token de sessão para o cliente
+        res.status(200).json({ message: 'Login bem-sucedido!', token });
+      });
     } else {
       res.status(401).send('Credenciais inválidas!');
     }
@@ -74,14 +55,63 @@ app.post('/login', (req, res) => {
 });
 
 
-// Rota para logout
-app.post('/logout', (req, res) => {
-  req.session.destroy(err => {
+function verificarSessao(req, res, next) {
+  const authHeader = req.headers.authorization; // Obtém o cabeçalho Authorization
+
+  if (!authHeader || typeof authHeader !== 'string') {
+    console.warn('Cabeçalho Authorization ausente ou inválido.');
+    return res.status(401).send('Token não fornecido. Faça login novamente.');
+  }
+
+  // O cabeçalho Authorization deve seguir o formato "Bearer <token>"
+  const [prefix, token] = authHeader.split(' ');
+
+  if (prefix !== 'Bearer' || !token || token.trim().length === 0) {
+    console.warn('Token com formato inválido.');
+    return res.status(401).send('Formato do token inválido.');
+  }
+
+  console.log("Token recebido:", token.substring(0, 10) + '...');
+
+  const query = 'SELECT * FROM usuarios WHERE session_token = ?';
+  db.query(query, [token], (err, results) => {
     if (err) {
-      res.status(500).send('Erro ao encerrar a sessão.');
-      return;
+      console.error('Erro ao verificar o token:', err.message);
+      return res.status(500).send('Erro interno do servidor.');
     }
-    res.send('Logout realizado com sucesso.');
+
+    if (results.length > 0) {
+      req.user = results[0]; // Armazena dados do usuário autenticado
+      console.log(`Usuário autenticado: ${req.user.nome}`);
+      return next();
+    }
+
+    console.warn('Token inválido ou não encontrado no banco de dados.');
+    return res.status(401).send('Acesso não autorizado.');
+  });
+}
+
+// Rota protegida
+app.get('/pagina-protegida', verificarSessao, (req, res) => {
+  res.send(`Bem-vindo, ${req.user.nome}. Esta página é protegida.`);
+});
+
+// Rota de logout
+app.post('/logout', (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).send('Token necessário para logout');
+  }
+
+  // Apaga o token de sessão do banco de dados
+  const updateQuery = 'UPDATE usuarios SET session_token = NULL WHERE session_token = ?';
+  db.query(updateQuery, [token], (err) => {
+    if (err) {
+      console.error('Erro ao realizar logout:', err);
+      return res.status(500).send('Erro ao realizar logout');
+    }
+    res.status(200).send('Logout realizado com sucesso');
   });
 });
 
