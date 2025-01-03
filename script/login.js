@@ -10,7 +10,7 @@ let sessionToken = ''; // Declare a variável no início
 // Função de login
 async function realizarLogin() {
   const login = document.getElementById('exampleLogin').value;
-  const senha = document.getElementById('exampleInputPassword1').value;
+  const senha = document.getElementById('passwordLogin').value;
 
   try {
     const response = await fetch('http://localhost:3000/login', {

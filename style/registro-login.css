@@ -38,7 +38,7 @@
     font-weight: bold;
 }
 
-#password1,#password2{
+#password{
     position: relative;
 }
 
@@ -64,6 +64,7 @@
 
 .toggle.showing{
 	background-image: url("../image/show.svg");
+    border: 0;
 }
 
 
