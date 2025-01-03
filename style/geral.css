@@ -44,7 +44,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    font-size: 35px;
+    font-size: 25px;
     font-weight: bold;
     font-family: 'Robotica', sans-serif;
     letter-spacing: 3px;
@@ -82,4 +82,88 @@ button:hover{
     font-weight: bold;
     color: black;
     border: 3px solid black;
+}
+
+button#user{
+    border: 1px solid white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50% ;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+    background-color: transparent;
+    background-image: url('../image/user-solid.svg');
+    background-position: center;
+    background-size: 65%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+#collapseExample.collapse{
+    position: absolute;
+    z-index: 1000;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+}
+
+.card{
+    color: black;
+
+}
+
+#ajuda,#seguranca,#visibilidade,#privacidade, #dados_usuario, #sair, #excluir{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 0;
+    background-color: transparent;
+    color: #101010;
+    letter-spacing: 2px;
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+#ajuda:hover, #seguranca:hover, #visibilidade:hover, #privacidade:hover, #dados_usuario:hover, #sair:hover, #excluir:hover{
+    background-color: transparent;
+    border: 1px solid black;
+}
+
+#ajuda span:first-child, #seguranca span:first-child, #visibilidade span:first-child, #privacidade span:first-child, #dados_usuario span:first-child, #sair span:first-child, #excluir span:first-child{
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#ajuda span:first-child{
+    background-image: url('../image/help-svgrepo-com.svg');
+}
+
+#seguranca span:first-child{
+    background-image: url('../image/security.svg');
+}
+
+#visibilidade span:first-child{
+    background-image: url('../image/eye-solid.svg');
+}
+
+#privacidade span:first-child{
+    background-image: url('../image/padlock.svg');
+}
+
+#dados_usuario span:first-child{
+    background-image: url('../image/user.svg');
+}
+
+#sair span:first-child{
+    background-image: url('../image/logout.svg');
+}
+
+#excluir span:first-child{
+    background-image: url('../image/delete.svg');
+}
+
+#ajuda span:last-child, #seguranca span:last-child, #visibilidade span:last-child, #privacidade span:last-child, #dados_usuario span:last-child, #sair span:last-child, #excluir span:last-child{
+    padding: 5px;
 }

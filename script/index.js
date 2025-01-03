@@ -21,12 +21,21 @@ async function acessarPaginaProtegida() {
 
     if (response.ok) {
       console.log('Usuário autenticado');
+      const iconUser = document.getElementById('user-item')
+      iconUser.style.display = 'block'
+      const entrar = document.getElementById('entrar')
+      entrar.style.display = 'none'
     } else {
+      const iconUser = document.getElementById('user-item')
+      iconUser.style.display = 'none'
+
+      const entrar = document.getElementById('entrar')
+      entrar.style.display = 'block'
       console.log('Usuário não autenticado. Redirecionando para o login.');
       alert('Você precisa fazer login para acessar esta página.');
-      setTimeout(() => {
+      /*setTimeout(() => {
         window.location.href = '../pages/login.html'; // Redireciona para o login
-      }, 1000); // Delay de 1 segundo
+      }, 1000); // Delay de 1 segundo*/
     }
 
   } catch (error) {
