@@ -5,7 +5,7 @@ const db = mysql.createConnection({
   host: '127.0.0.1',    // Host do banco
   port: 3306, // Porta padrão do MySQL
   user: 'root',         // Usuário do MySQL
-  password: 'Senha',         // Senha do MySQL (coloque sua senha aqui)
+  password: '@Pedro48100@',         // Senha do MySQL (coloque sua senha aqui)
   database: 'sistema_login' // Nome do banco de dados
 });
 
